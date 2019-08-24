@@ -1,0 +1,223 @@
+start hive from hive/bin dir !
+
+[root@fprhel ~]# hdfs dfs -mkdir /data
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/lib/hadoop-tarfs-2.0_beta-jar-with-dependencies.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+19/07/20 20:49:51 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+[root@fprhel ~]# hdfs dfs -put /home/frank/test/1.dat /data/data.dat
+SLF4J: Class path contains multiple SLF4J bindings.
+
+
+CREATE EXTERNAL TABLE data
+(id int, name string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+LOCATION "/data";
+
+hive> CREATE EXTERNAL TABLE data
+    > (id int, name string)
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    > LOCATION "/data";
+OK
+Time taken: 1.027 seconds
+hive> 
+    > 
+    > select * from data;
+OK
+1	a
+2	b
+3	c
+4	d
+NULL	NULL
+Time taken: 4.15 seconds, Fetched: 5 row(s)
+hive> 
+
+[root@fprhel ~]# hdfs dfs -mkdir /tardata
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/lib/hadoop-tarfs-2.0_beta-jar-with-dependencies.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+19/07/20 20:52:47 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[root@fprhel ~]# hdfs dfs -put /home/frank/test.tar /tardata
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/lib/hadoop-tarfs-2.0_beta-jar-with-dependencies.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+19/07/20 20:53:08 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[root@fprhel ~]# 
+[root@fprhel ~]# hdfs dfs -ls tar:///tardata/test.tar
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/lib/hadoop-tarfs-2.0_beta-jar-with-dependencies.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+19/07/20 20:53:39 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+19/07/20 20:53:40 INFO tar.TarFileSystem: *** Using Tar file system ***
+Found 2 items
+-rw-r--r--   1 root root         17 2019-07-20 07:36 tar:///tardata/test.tar/+test+1.dat
+-rw-r--r--   1 root root         26 2019-07-20 07:37 tar:///tardata/test.tar/+test+2.dat
+[root@fprhel ~]# hdfs dfs -cat tar:///tardata/test.tar/+test+1.dat
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/hadoop-2.7.5/lib/hadoop-tarfs-2.0_beta-jar-with-dependencies.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+19/07/20 20:53:58 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+19/07/20 20:53:58 INFO tar.TarFileSystem: *** Using Tar file system ***
+1,a
+2,b
+3,c
+4,d
+
+[root@fprhel ~]# 
+
+hive> drop table tardata;
+OK
+Time taken: 0.101 seconds
+hive> CREATE EXTERNAL TABLE tardata
+    > (id int, name string)
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    > LOCATION "tar:///tardata/test.tar";
+OK
+Time taken: 0.922 seconds
+hive> 
+    > select * from tardata;
+OK
+1	a
+2	b
+3	c
+4	d
+NULL	NULL
+5	aa
+6	bb
+7	cc
+8	dd
+9	ee
+NULL	NULL
+Time taken: 3.298 seconds, Fetched: 11 row(s)
+hive> 
+
+drop table year2017;
+
+CREATE EXTERNAL TABLE year2017
+    (id int, name string, year int )
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    LOCATION "tar:///tmp/year2017.tar";
+
+select * from year2017;
+
+hive> 
+    > CREATE EXTERNAL TABLE year2017
+    >     (id int, name string, year int )
+    >     ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    >     LOCATION "tar:///tmp/year2017.tar";
+OK
+Time taken: 0.231 seconds
+hive> 
+    > select * from year2017;
+OK
+1	a	2017
+2	b	2017
+3	c	2017
+NULL	NULL	NULL
+4	d	2017
+5	e	2017
+6	f	2017
+NULL	NULL	NULL
+Time taken: 0.36 seconds, Fetched: 8 row(s)
+hive> 
+
+
+ 1124  hdfs dfs -put titi.tar /tardata/year2019.tar
+ 1126  hdfs dfs -put tutu.tar /tardata/year2018.tar
+ 1127  hdfs dfs -put toto.tar /tardata/year2017.tar
+
+drop table partdata;
+
+CREATE EXTERNAL TABLE partdata(id int, name string )
+PARTITIONED BY (year int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
+STORED AS TEXTFILE
+LOCATION '/tmp';
+
+ALTER TABLE partdata ADD PARTITION (year=2017) LOCATION 'tar:///tardata/year2017.tar';
+ALTER TABLE partdata ADD PARTITION (year=2018) LOCATION 'tar:///tardata/year2018.tar';
+ALTER TABLE partdata ADD PARTITION (year=2019) LOCATION 'tar:///tardata/year2019.tar';
+
+select * from partdata;
+
+
+hive> 
+    > CREATE EXTERNAL TABLE partdata(id int, name string )
+    > PARTITIONED BY (year int)
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
+    > STORED AS TEXTFILE
+    > LOCATION '/tmp';
+OK
+Time taken: 0.643 seconds
+hive> ALTER TABLE partdata ADD PARTITION (year=2017) LOCATION 'tar:///tardata/year2017.tar';
+OK
+Time taken: 0.418 seconds
+hive> ALTER TABLE partdata ADD PARTITION (year=2018) LOCATION 'tar:///tardata/year2018.tar';
+OK
+Time taken: 0.347 seconds
+hive> ALTER TABLE partdata ADD PARTITION (year=2019) LOCATION 'tar:///tardata/year2019.tar';
+OK
+Time taken: 0.233 seconds
+hive> select * from partdata;
+OK
+1	a	2017
+2	b	2017
+3	c	2017
+NULL	NULL	2017
+4	d	2017
+5	e	2017
+6	f	2017
+NULL	NULL	2017
+1	aa	2018
+2	bb	2018
+3	cc	2018
+4	dd	2018
+5	ee	2018
+6	ff	2018
+11	aaa	2019
+12	bbb	2019
+13	ccc	2019
+14	ddd	2019
+15	eee	2019
+16	fff	2019
+Time taken: 0.826 seconds, Fetched: 20 row(s)
+hive> 
+
+
+
+drop table a2017;
+
+CREATE EXTERNAL TABLE a2018
+    (id int, name string, year int )
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    LOCATION "tar:///tardata/year2017.tar";
+
+select * from a2017;
+
+drop table a2018;
+
+CREATE EXTERNAL TABLE a2018
+    (id int, name string, year int )
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    LOCATION "tar:///tardata/year2018.tar";
+
+select * from a2018;
+
+CREATE EXTERNAL TABLE a2019
+    (id int, name string, year int )
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY "," STORED AS TEXTFILE
+    LOCATION "tar:///tardata/year2019.tar";
+
+select * from a2019;
+
